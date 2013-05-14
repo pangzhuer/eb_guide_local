@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations" value="classpath:conf/app.conf" />
+	</bean>
+
+	<bean id="ebguide.sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value="classpath:mybatis/MapperConfig.xml" />
+		<property name="dataSource">
+			<bean class="com.mchange.v2.c3p0.ComboPooledDataSource"
+				destroy-method="close">
+				<property name="driverClass" value="${accelerate.jdbc.driverClass}" />
+				<property name="jdbcUrl" value="${accelerate.jdbc.url}" />
+				<property name="user" value="${accelerate.jdbc.user}" />
+				<property name="password" value="${accelerate.jdbc.password}" />
+				<!--连接池中保留的最小连接数。 -->
+				<property name="minPoolSize" value="${connectionsMin}" />
+				<!--连接池中保留的最大连接数。 -->
+				<property name="maxPoolSize" value="${connectionsMax}" />
+				<!--初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
+				<property name="initialPoolSize" value="${connectionsMin}" />
+				<!--最大空闲时间,60秒内未使用则连接被丢弃。若为0则永不丢弃。 -->
+				<property name="maxIdleTime" value="300" />
+
+				<!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
+				<property name="acquireIncrement" value="${connectionsAcquireEach}" />
+
+				<!--每60秒检查所有连接池中的空闲连接。Default: 0 -->
+				<property name="idleConnectionTestPeriod" value="60" />
+
+				<!--定义在从数据库获取新连接失败后重复尝试的次数。Default: 30 -->
+				<property name="acquireRetryAttempts" value="30" />
+
+				<property name="preferredTestQuery" value="SELECT 1" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.duowan.ebguide.dao" />
+		<property name="sqlSessionFactory" ref="ebguide.sqlSessionFactory" />
+	</bean>
+	 
+	
+</beans>
